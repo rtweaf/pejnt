@@ -29,22 +29,40 @@ window.addEventListener('keydown', (event) => {
                 ? 'black' : 'white';
             break;
 
-        case 'z':
-            if (event.ctrlKey && History.length > 0)
+        case 'z':            
+            if (event.ctrlKey && History.length > 0) {
+                const image = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+                
                 ctx.putImageData(History.pop(), 0, 0);
+
+                if (HistoryUndo.length >= 128)
+                    History.shift();
+            
+                HistoryUndo.push(image);
+            }
             break;
 
         case 'y':
-            if (event.ctrlKey && History.length > 0)
-                ctx.putImageData(History.shift(), 0, 0);
+            const image = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+            saveChange();
+
+            if (event.ctrlKey && HistoryUndo.length > 0)
+                ctx.putImageData(HistoryUndo.pop(), 0, 0);
+            
             break;
     }
 });
 
 document.addEventListener('paste', (event) => {
+    const file = event.clipboardData.files[0];
+    
+    if (!file || file.type != 'image/png')
+        return;
+    
     const image = new Image();
     image.onload = () => {
         ctx.drawImage(image, Position.x, Position.y);
     }
-    image.src = URL.createObjectURL(event.clipboardData.items[0].getAsFile());
+    image.src = URL.createObjectURL(file);
+    saveChange();
 });

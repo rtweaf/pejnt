@@ -4,6 +4,7 @@ const canvas = document.createElement('canvas');
 
 const Position = { x: 0, y: 0 };
 const History = [];
+const HistoryUndo = [];
 
 resize = () => {
     const temp = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
